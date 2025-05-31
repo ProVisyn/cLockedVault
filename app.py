@@ -50,26 +50,27 @@ def register():
             users[email] = {"password": password, "role": "user"}
             invite_codes[invite_code] = False
             return redirect(url_for('login'))
-    return render_template('register.html')
-
-@app.route('/upload', methods=['POST'])
-def upload():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    file = request.files['file']
-    if file:
-        filename = secure_filename(file.filename)
-        user_folder = os.path.join(app.config['UPLOAD_FOLDER'], session['user'])
-        os.makedirs(user_folder, exist_ok=True)
-        file.save(os.path.join(user_folder, filename))
-    return redirect(url_for('index'))
-
-@app.route('/download/<filename>')
-def download(filename):
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], session['user'])
     return send_from_directory(user_folder, filename, as_attachment=True)
+
+# Create default admin account if it doesn't exist
+def create_admin_user():
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT,
+                    email TEXT,
+                    password TEXT
+                )''')
+    c.execute("SELECT * FROM users WHERE email = ?", ("jamesmaingames401@gmail.com",))
+    if not c.fetchone():
+        from werkzeug.security import generate_password_hash
+        c.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+                  ("admin", "jamesmaingames401@gmail.com", generate_password_hash("admin123")))
+        conn.commit()
+    conn.close()
+
+create_admin_user()
 
 if __name__ == '__main__':
     app.run(debug=True)
