@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ClockedVault</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/darkmode.js" defer></script>
+</head>
+<body>
+  <button id="darkModeToggle">Toggle Dark Mode</button>
+  <nav>
+    <a href="/">Dashboard</a> |
+    <a href="/files">Files</a> |
+    <a href="/settings">Settings</a> |
+    <a href="/family">Family</a> |
+    <a href="/logout">Logout</a>
+  </nav>
+  {% block content %}{% endblock %}
+</body>
+</html>
