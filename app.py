@@ -3,11 +3,12 @@ import sqlite3
 import os
 import uuid
 import zipfile
+import shutil  # Added missing import for shutil
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import (
     Flask, render_template, request, redirect,
-    url_for, session, send_from_directory, flash, abort, jsonify
+    url_for, session, send_from_directory, flash, abort
 )
 
 app = Flask(__name__)
@@ -300,7 +301,6 @@ def rename():
         flash("Original item not found")
     return redirect(url_for('files'))
 
-# Settings route
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     if 'user' not in session:
@@ -340,8 +340,7 @@ def family():
         target = request.form['target'].strip()
         path = request.form['path'].strip()
         can_edit = 1 if request.form.get('edit') == 'on' else 0
-        c.execute("INSERT INTO shares (owner, target_user, path, can_edit) VALUES (?, ?, ?, ?)",
-                  (user, target, path, can_edit))
+        c.execute("INSERT INTO shares (owner, target_user, path, can_edit) VALUES (?, ?, ?, ?)", (user, target, path, can_edit))
         conn.commit()
         flash("Successfully shared")
     c.execute("SELECT owner, path, can_edit FROM shares WHERE target_user = ?", (user,))
@@ -349,7 +348,6 @@ def family():
     conn.close()
     return render_template('family.html', shares=shares)
 
-# Activity feed for users
 @app.route('/feed')
 def feed():
     if 'user' not in session:
@@ -362,7 +360,6 @@ def feed():
     conn.close()
     return render_template('feed.html', actions=actions)
 
-# Admin dashboard with analytics
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if 'user' not in session or not is_admin_user():
@@ -375,17 +372,14 @@ def admin():
     invites = c.fetchall()
     c.execute("SELECT user, action, path, timestamp FROM logs ORDER BY timestamp DESC LIMIT 100")
     logs = c.fetchall()
-    # Analytics: count total users, total storage usage, total files
     c.execute("SELECT COUNT(*) FROM users")
     total_users = c.fetchone()[0]
-    # Calculate storage usage
     total_storage = 0
     for u in users:
         ufolder = os.path.join(UPLOAD_FOLDER, u[1])
         for root, dirs, files_list in os.walk(ufolder):
             for f in files_list:
                 total_storage += os.path.getsize(os.path.join(root, f))
-    # Pending requests for sub-admin actions
     c.execute("SELECT id, requester, action_type, target, description, created_at FROM requests WHERE status = 'pending'")
     requests = c.fetchall()
     conn.close()
@@ -454,20 +448,16 @@ def review_request(req_id, decision):
         conn.close()
         flash("Request not found or already reviewed.")
         return redirect(url_for('admin'))
-    # Approve or deny
     if decision == 'approve':
-        # Execute requested action
         if req[1] == 'promote':
             c.execute("UPDATE users SET is_admin = 1 WHERE email = ?", (req[2],))
             log_action(session['user'], f'approved_promote:{req[2]}')
         elif req[1] == 'delete':
             c.execute("DELETE FROM users WHERE email = ?", (req[2],))
             log_action(session['user'], f'approved_delete:{req[2]}')
-        # Mark request approved
         c.execute("UPDATE requests SET status = 'approved', reviewed_by = ?, reviewed_at = ? WHERE id = ?",
                   (session['user'], datetime.utcnow().isoformat(), req_id))
     else:
-        # Deny request
         c.execute("UPDATE requests SET status = 'denied', reviewed_by = ?, reviewed_at = ? WHERE id = ?",
                   (session['user'], datetime.utcnow().isoformat(), req_id))
         log_action(session['user'], f'denied_request:{req_id}')
@@ -514,8 +504,7 @@ def notifications():
     user = session['user']
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    # Example: notifications are logs related to shares or invites
-    c.execute("SELECT action, path, timestamp FROM logs WHERE user = ? ORDER BY timestamp DESC LIMIT 50", (user,))
+    c.execute("SELECT action, path, timestamp FROM logs WHERE user = ? ORDER BY timestamp DESC LIMIT 50", (Note))
     notes = c.fetchall()
     conn.close()
     return render_template('notifications.html', notes=notes)
