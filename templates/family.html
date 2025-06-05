@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Family (Shared Files)</h2>
+<form method="POST">
+  Target User Email: <input type="email" name="target"><br/>
+  Path to File/Folder (relative to your uploads): <input type="text" name="path"><br/>
+  Can Edit? <input type="checkbox" name="edit"><br/>
+  <input type="submit" value="Share"/>
+</form>
+<table border="1">
+  <tr><th>Owner</th><th>Path</th><th>Can Edit</th></tr>
+  {% for owner, path, can_edit in shares %}
+    <tr>
+      <td>{{ owner }}</td>
+      <td>{{ path }}</td>
+      <td>{{ 'Yes' if can_edit else 'No' }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% for message in get_flashed_messages() %}
+  <p style="color:red;">{{ message }}</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+<h3>Users</h3>
+<table border="1">
+  <tr><th>Username</th><th>Email</th><th>Role</th></tr>
+  {% for username, email, is_admin in users %}
+    <tr>
+      <td>{{ username }}</td>
+      <td>{{ email }}</td>
+      <td>{{ 'Admin' if is_admin else 'User' }}</td>
+    </tr>
+  {% endfor %}
+</table>
+<h3>Invite Codes</h3>
+<form method="POST" action="/generate_invite"><button type="submit">Generate Invite</button></form>
+<table border="1">
+  <tr><th>Code</th><th>Used</th><th>Created By</th><th>Created At</th></tr>
+  {% for code, used, by, at in invites %}
+    <tr>
+      <td>{{ code }}</td>
+      <td>{{ 'Yes' if used else 'No' }}</td>
+      <td>{{ by }}</td>
+      <td>{{ at }}</td>
+    </tr>
+  {% endfor %}
+</table>
+<h3>Activity Logs</h3>
+<table border="1">
+  <tr><th>User</th><th>Action</th><th>Path</th><th>Timestamp</th></tr>
+  {% for user, action, path, timestamp in logs %}
+    <tr>
+      <td>{{ user }}</td>
+      <td>{{ action }}</td>
+      <td>{{ path }}</td>
+      <td>{{ timestamp }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Your Files</h2>
+<form method="POST" enctype="multipart/form-data">
+  <input type="file" name="file" multiple webkitdirectory directory><br/>
+  <input type="submit" value="Upload"/>
+</form>
+<table border="1">
+  <tr><th>Name</th><th>Type</th><th>Size</th><th>Timestamp</th><th>Download</th></tr>
+  {% for item in items %}
+    <tr>
+      <td>{{ item.name }}</td>
+      <td>{{ item.type }}</td>
+      <td>{{ item.size }}</td>
+      <td>{{ item.timestamp }}</td>
+      <td><a href="{{ url_for('download', filename=item.name) }}">Download</a></td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}
