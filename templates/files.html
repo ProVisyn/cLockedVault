@@ -5,8 +5,11 @@
   <input type="file" name="file" multiple webkitdirectory directory><br/>
   <input type="submit" value="Upload"/>
 </form>
+<a href="/versions">View Version History</a>
 <table border="1">
-  <tr><th>Name</th><th>Type</th><th>Size</th><th>Timestamp</th><th>Download</th></tr>
+  <tr>
+    <th>Name</th><th>Type</th><th>Size</th><th>Timestamp</th><th>Download</th><th>Rename</th><th>Delete</th>
+  </tr>
   {% for item in items %}
     <tr>
       <td>{{ item.name }}</td>
@@ -14,7 +17,23 @@
       <td>{{ item.size }}</td>
       <td>{{ item.timestamp }}</td>
       <td><a href="{{ url_for('download', filename=item.name) }}">Download</a></td>
+      <td>
+        <form method="POST" action="{{ url_for('rename') }}" style="display:inline;">
+          <input type="hidden" name="old_name" value="{{ item.name }}">
+          <input type="text" name="new_name" placeholder="New name">
+          <button type="submit">Rename</button>
+        </form>
+      </td>
+      <td>
+        <form method="POST" action="{{ url_for('delete') }}" style="display:inline;">
+          <input type="hidden" name="filename" value="{{ item.name }}">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
     </tr>
   {% endfor %}
 </table>
+{% for message in get_flashed_messages() %}
+  <p style="color:red;">{{ message }}</p>
+{% endfor %}
 {% endblock %}

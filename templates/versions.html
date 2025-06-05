@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Version History</h2>
+<table border="1">
+  <tr><th>Versioned File</th><th>Download</th></tr>
+  {% for v in versions %}
+    <tr>
+      <td>{{ v }}</td>
+      <td><a href="{{ url_for('download_version', version_name=v) }}">Download</a></td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

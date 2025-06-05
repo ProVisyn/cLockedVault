@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Notifications</h2>
+<table border="1">
+  <tr><th>Action</th><th>Path</th><th>Timestamp</th></tr>
+  {% for action, path, timestamp in notes %}
+    <tr>
+      <td>{{ action }}</td>
+      <td>{{ path }}</td>
+      <td>{{ timestamp }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

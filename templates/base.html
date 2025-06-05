@@ -11,10 +11,12 @@
   <nav>
     <a href="/files">Files</a> |
     <a href="/settings">Settings</a> |
-    <a href="/family">Family</a>
+    <a href="/family">Family</a> |
+    <a href="/feed">Activity Feed</a>
     {% if session.get('is_admin') %}
-    | <a href="/admin">Admin</a>
+      | <a href="/admin">Admin</a>
     {% endif %}
+    | <a href="/notifications">Notifications</a>
     | <a href="/logout">Logout</a>
   </nav>
   <main>
